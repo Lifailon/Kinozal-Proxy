@@ -3,7 +3,7 @@ module.exports = {
         return [
             {
                 source: '/:path*',
-                destination: 'https://kinozal.tv/:path*',
+                destination: '/api/proxy/:path*',
             },
         ];
     },
