@@ -1,22 +1,26 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import https from 'https';
-import nodeFetch from 'node-fetch';
-import fetchCookie from 'fetch-cookie';
-import { CookieJar } from 'tough-cookie';
+import { NextApiRequest, NextApiResponse } from 'next'
+import https from 'https'
+import nodeFetch from 'node-fetch'
+import fetchCookie from 'fetch-cookie'
+import { CookieJar } from 'tough-cookie'
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
 // https://github.com/salesforce/tough-cookie
 
 // Создаем CookieJar для хранения куков
-const jar = new CookieJar();
+const jar = new CookieJar()
 // Интегрируем fetch с CookieJar
-const fetch = fetchCookie(nodeFetch, jar);
+const fetch = fetchCookie(nodeFetch, jar)
 
-const baseUrl = "https://kinozal.tv";
+//////////////////////////////////////////////////////////////////
+
+const baseUrl = "https://kinozal.vercel.app"
+
+//////////////////////////////////////////////////////////////////
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { method, headers, body } = req;
+    const { method, headers, body } = req
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
@@ -37,18 +41,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'upgrade-insecure-requests': Array.isArray(headers['upgrade-insecure-requests']) ? headers['upgrade-insecure-requests'][0] : headers['upgrade-insecure-requests'] || '',
         'Referer': Array.isArray(headers['referer']) ? headers['referer'][0] : headers['referer'] || '',
         'Referrer-Policy': Array.isArray(headers['referrer-policy']) ? headers['referrer-policy'][0] : headers['referrer-policy'] || '',
-    };
+    }
 
     // Если есть тело запроса, то преобразуем его в строку
-    let authString: string | undefined;
+    let authString: string | undefined
     if (body) {
-        authString = new URLSearchParams(body as Record<string, string>).toString();
-        console.log(' Body:', authString);
+        authString = new URLSearchParams(body as Record<string, string>).toString()
+        console.log('Body:', authString)
     }
+
+    // Декодируем кириллицу для поисковых запросов
+    const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
 
     try {
         // Запрос к серверу
-        const response = await fetch(`${baseUrl}${req.url}`, {
+        const response = await fetch(decodeUrl, {
             // Передаем заголовки запроса от клиента к серверу
             headers: requestHeaders,
             // Проверяем метод и передаем тело запроса
@@ -58,25 +65,103 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             agent: new https.Agent({ rejectUnauthorized: false }),
             // Включаем перенаправление запросов для получения cookie из POST-запроса
             redirect: 'follow',
-        });
+        })
 
         // Получаем cookies текущего домена из CookieJar для последующих запросов
-        const cookies = await jar.getCookies(`${baseUrl}${req.url}`);
+        const cookies = await jar.getCookies(`${baseUrl}${req.url}`)
         if (cookies.length > 0) {
-            const cookieHeaders = cookies.map(cookie => cookie.cookieString());
-            console.log(' Cookies:', cookieHeaders);
-            res.setHeader('Set-Cookie', cookieHeaders);
+            const cookieHeaders = cookies.map(cookie => cookie.cookieString())
+            console.log('Cookies:', cookieHeaders)
+            res.setHeader('Set-Cookie', cookieHeaders)
         }
 
         // Возвращяем ответ клиенту через pipe по частям (без загрузки памяти)
-        res.status(response.status);
+        res.status(response.status)
         if (response.body) {
-            response.body.pipe(res);
+            response.body.pipe(res)
         } else {
-            res.end();
+            res.end()
         }
     } catch (error) {
-        console.error(' Error request:', error);
-        res.status(500).send('Error request');
+        console.error(' Error request:', error)
+        res.status(500).send('Error request')
     }
+}
+
+// Функция для декодируем кириллицы в заголовке запроса
+function decodeCyrillic(str: string) {
+    if (str.includes("s=")) {
+        // Словарь символов Windows-1251
+        const cyrillicMap: { [key: string]: string } = {
+            '%20': '+',
+            '%E0': 'а',
+            '%E1': 'б',
+            '%E2': 'в',
+            '%E3': 'г',
+            '%E4': 'д',
+            '%E5': 'е',
+            '%E6': 'ж',
+            '%E7': 'з',
+            '%E8': 'и',
+            '%E9': 'й',
+            '%EA': 'к',
+            '%EB': 'л',
+            '%EC': 'м',
+            '%ED': 'н',
+            '%EE': 'о',
+            '%EF': 'п',
+            '%F0': 'р',
+            '%F1': 'с',
+            '%F2': 'т',
+            '%F3': 'у',
+            '%F4': 'ф',
+            '%F5': 'х',
+            '%F6': 'ц',
+            '%F7': 'ч',
+            '%F8': 'ш',
+            '%F9': 'щ',
+            '%FA': 'ъ',
+            '%FB': 'ы',
+            '%FC': 'ь',
+            '%FD': 'э',
+            '%FE': 'ю',
+            '%FF': 'я',
+            '%C0': 'А',
+            '%C1': 'Б',
+            '%C2': 'В',
+            '%C3': 'Г',
+            '%C4': 'Д',
+            '%C5': 'Е',
+            '%C6': 'Ж',
+            '%C7': 'З',
+            '%C8': 'И',
+            '%C9': 'Й',
+            '%CA': 'К',
+            '%CB': 'Л',
+            '%CC': 'М',
+            '%CD': 'Н',
+            '%CE': 'О',
+            '%CF': 'П',
+            '%D0': 'Р',
+            '%D1': 'С',
+            '%D2': 'Т',
+            '%D3': 'У',
+            '%D4': 'Ф',
+            '%D5': 'Х',
+            '%D6': 'Ц',
+            '%D7': 'Ч',
+            '%D8': 'Ш',
+            '%D9': 'Щ',
+            '%DA': 'Ъ',
+            '%DB': 'Ы',
+            '%DC': 'Ь',
+            '%DD': 'Э',
+            '%DE': 'Ю',
+            '%DF': 'Я',
+        }
+        // Замена всех закодированных символов
+        str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
+        console.log("Search:", str.replace(/^.*s=/, ""));
+    }
+    return str
 }
