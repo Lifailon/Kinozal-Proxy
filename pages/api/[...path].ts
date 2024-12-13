@@ -31,11 +31,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
         'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
-        'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || 'text/html',
-        'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
-        'accept-charset': 'utf-8, windows-1251;q=0.9',
-        'accept-encoding': Array.isArray(headers['accept-encoding']) ? headers['accept-encoding'][0] : headers['accept-encoding'] || 'gzip, deflate',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
+        'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
+        'accept-language': Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
         'content-type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || '',
         'priority': Array.isArray(headers['priority']) ? headers['priority'][0] : headers['priority'] || '',
@@ -60,15 +58,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Декодируем кириллицу для поисковых запросов
     // const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
-    const reqUrl = `${baseUrl}${req.url}`
+    const requestUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
+        console.log('Search url:', new URL(req.url))
         console.log('Search query:', requestSearch)
+        console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
+        console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
+        console.log('Headers:', req.headers)
     }
     
     try {
         // Запрос к серверу
-        const response = await fetch(reqUrl, {
+        const response = await fetch(requestUrl, {
             // Передаем заголовки запроса от клиента к серверу
             headers: requestHeaders,
             // Проверяем метод и передаем тело запроса
