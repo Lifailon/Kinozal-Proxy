@@ -30,8 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
-        // 'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded; charset=UTF-8',
         'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
@@ -61,6 +60,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
         console.log('Search query:', requestSearch)
+        console.log('Search url:', new URL(requestSearch))
+        console.log('Search url param:', new URLSearchParams({ s: requestSearch }))
         console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
         console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
         console.log('Headers:', req.headers)
