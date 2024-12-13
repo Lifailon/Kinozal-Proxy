@@ -1,16 +1,16 @@
 {
   "blacklist": [],
   "custom": {},
-  "last-update": 1734094765460,
+  "last-update": 1734099787507,
   "mode": "whitelist",
   "parser": {},
   "protected": [
-    "google.com/recaptcha",
-    "gstatic.com/recaptcha",
-    "accounts.google.com",
-    "accounts.youtube.com",
-    "gitlab.com/users/sign_in",
-    "challenges.cloudflare.com"
+    "cloudflare.com",
+    "google.com",
+    "gstatic.com",
+    "youtube.com",
+    "gitlab.com",
+    "github.com"
   ],
   "remote-address": "",
   "ua": "curl/8.9.1",
@@ -20,6 +20,6 @@
     "kinozal.vercel.app",
     "kinozal-proxy.vercel.app"
   ],
-  "json-guid": "47904503-3c15-4f9e-9b63-0b63cbe29eec",
+  "json-guid": "9780fb1c-fef8-4c82-887d-bcf2cb920956",
   "json-forced": false
 }

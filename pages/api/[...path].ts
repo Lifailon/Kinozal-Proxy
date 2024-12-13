@@ -62,18 +62,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Декодируем кириллицу для поисковых запросов
     // const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
 
-    let decodePath
+    let decodePath;
     if (req.url) {
-        console.log('Encode url:', req.url)
-        const encodeBuffer = Buffer.from(req.url, 'binary')
-        const iconvDecode = iconv.decode(encodeBuffer, 'windows-1251')
-        console.log('Decoded URL via iconv:', iconvDecode)
-        let urlDecode = iconvDecode
-        if (/%[0-9A-Fa-f]{2}/.test(iconvDecode)) {
-            urlDecode = decodeURIComponent(iconvDecode)
-            console.log('Decoded URL via decodeURIComponent:', urlDecode)
+        console.log('Encoded URL:', req.url);
+        if (/%[0-9A-Fa-f]{2}/.test(req.url)) {
+            try {
+                let urlDecode = decodeURIComponent(req.url);
+                console.log('Decoded as UTF-8:', urlDecode);
+                if (/[\uFFFD]/.test(urlDecode)) {
+                    console.log('Detected invalid characters, attempting windows-1251 decode.');
+                    const encodedBuffer = Buffer.from(req.url, 'binary');
+                    const iconvDecode = iconv.decode(encodedBuffer, 'windows-1251');
+                    urlDecode = decodeURIComponent(iconvDecode);
+                    console.log('Decoded as windows-1251:', urlDecode);
+                }
+                decodePath = urlDecode;
+            } catch (error) {
+                console.error('Error decoding URL:', error);
+            }
+        } else {
+            decodePath = req.url;
         }
-        decodePath = urlDecode
+        console.log('Final Decoded Path:', decodePath);
     }
 
     try {
