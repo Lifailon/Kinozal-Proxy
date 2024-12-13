@@ -16,16 +16,13 @@ const jar = new CookieJar()
 const fetch = fetchCookie(nodeFetch, jar)
 
 const baseUrl = "https://kinozal.tv"
-// const baseUrl = "https://kinozal.me"
-// const baseUrl = "https://kinozal.vercel.app"
-// const baseUrl = "https://kinozal-proxy.vercel.app"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method, headers, body } = req
 
     // Пропускаем только curl/* для клиентов Kinozal-Bot
     const userAgent = headers['user-agent'] || ''
-    if (!userAgent.includes('curl/')) {
+    if (!userAgent.startsWith('curl/')) {
         console.log('Access denied for agent:', userAgent)
         res.status(403).send('Access denied: only curl agent')
         return
@@ -33,7 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
-        'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
+        // 'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
+        'Content-Type': 'Content-Type: text/html; charset=utf-8',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
         'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
         'accept-language': Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language'] || '',
@@ -61,34 +59,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Декодируем кириллицу для поисковых запросов
     // const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
-
-    let decodePath;
-    if (req.url) {
-        console.log('Encoded URL:', req.url);
-        if (/%[0-9A-Fa-f]{2}/.test(req.url)) {
-            try {
-                let urlDecode = decodeURIComponent(req.url);
-                console.log('Decoded as UTF-8:', urlDecode);
-                if (/[\uFFFD]/.test(urlDecode)) {
-                    console.log('Detected invalid characters, attempting windows-1251 decode.');
-                    const encodedBuffer = Buffer.from(req.url, 'binary');
-                    const iconvDecode = iconv.decode(encodedBuffer, 'windows-1251');
-                    urlDecode = decodeURIComponent(iconvDecode);
-                    console.log('Decoded as windows-1251:', urlDecode);
-                }
-                decodePath = urlDecode;
-            } catch (error) {
-                console.error('Error decoding URL:', error);
-            }
-        } else {
-            decodePath = req.url;
-        }
-        console.log('Final Decoded Path:', decodePath);
+    const decodeUrl = `${baseUrl}${req.url}`
+    if (req.url?.includes("s=")) {
+        const requestSearch = req.url.replace(/^.*s=/, "")
+        // console.log('Search url:', new URL(req.url))
+        console.log('Search query:', requestSearch)
+        console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
+        console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
+        console.log('Headers:', req.headers)
+        console.log('Referer:', req.headers?.referer)
     }
-
+    
     try {
         // Запрос к серверу
-        const response = await fetch(`${baseUrl}${decodePath}`, {
+        const response = await fetch(decodeUrl, {
             // Передаем заголовки запроса от клиента к серверу
             headers: requestHeaders,
             // Проверяем метод и передаем тело запроса
