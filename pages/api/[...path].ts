@@ -32,9 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const requestHeaders: Record<string, string> = {
         'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
         'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
-        'accept-language': Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language'] || '',
-        'accept-charset': '',
-        'accept-encoding': Array.isArray(headers['accept-encoding']) ? headers['accept-encoding'][0] : headers['accept-encoding'] || '',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
         'content-type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || '',
