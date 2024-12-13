@@ -19,7 +19,14 @@ const baseUrl = "https://kinozal.tv"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method, headers, body } = req
-
+    const originalUrl = req.url
+    if (originalUrl) {
+        const decodedUrl = decodeURIComponent(Buffer.from(originalUrl, 'latin1').toString('utf8'));
+        console.log('Decoded URL:', decodedUrl);
+    } else {
+        console.log('URL is undefined');
+    }
+    
     // Пропускаем запросы только для клиентов curl/*
     const userAgent = headers['user-agent'] || ''
     if (!userAgent.startsWith('curl/')) {
@@ -60,11 +67,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
         console.log('Search query:', requestSearch)
-        console.log('Search url:', new URL(requestSearch))
         console.log('Search url param:', new URLSearchParams({ s: requestSearch }))
         console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
         console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
-        console.log('Headers:', req.headers)
+        console.log('Request:', req)
     }
     
     try {
