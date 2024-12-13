@@ -60,39 +60,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Декодируем кириллицу для поисковых запросов
-    let decodedUrl = ''
+    // const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
 
+    let decodePath
     if (req.url) {
-        try {
-            // Проверяем, содержит ли URL закодированные символы (например, %xx)
-            if (/%[0-9A-Fa-f]{2}/.test(req.url)) {
-                decodedUrl = decodeURIComponent(req.url)
-            } else {
-                decodedUrl = req.url // Уже декодировано
-            }
-        } catch (error) {
-            console.error('Ошибка при декодировании URL:', error)
-            decodedUrl = req.url // Возвращаем оригинальный URL в случае ошибки
+        console.log('Encode url:', req.url)
+        const encodeBuffer = Buffer.from(req.url, 'binary')
+        const iconvDecode = iconv.decode(encodeBuffer, 'windows-1251')
+        console.log('Decoded URL via iconv:', iconvDecode)
+        let urlDecode = iconvDecode
+        if (/%[0-9A-Fa-f]{2}/.test(iconvDecode)) {
+            urlDecode = decodeURIComponent(iconvDecode)
+            console.log('Decoded URL via decodeURIComponent:', urlDecode)
         }
-    } else {
-        console.error('URL отсутствует в запросе')
-    }
-    console.log('Decoded URL:', decodedUrl)
-    const decodeUrl = `${baseUrl}${decodedUrl}`
-
-    if (req.url) {
-        const decodederUrl = iconv.decode(Buffer.from(req.url, 'binary'), 'windows-1251')
-        console.log('Decoded URL via iconv from binary:', decodederUrl)
-    }
-
-    if (req.url) {
-        const decodederUrl = iconv.decode(Buffer.from(req.url, 'utf-8'), 'windows-1251')
-        console.log('Decoded URL via iconv from utf-8:', decodederUrl)
+        decodePath = urlDecode
     }
 
     try {
         // Запрос к серверу
-        const response = await fetch(decodeUrl, {
+        const response = await fetch(`${baseUrl}${decodePath}`, {
             // Передаем заголовки запроса от клиента к серверу
             headers: requestHeaders,
             // Проверяем метод и передаем тело запроса
@@ -120,28 +106,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.end()
         }
     } catch (error) {
-        console.error(' Error request:', error)
-        res.status(500).send('Error request')
+        console.error('Error request:', error)
+        res.status(500).send('Error request: destination server not available')
     }
 }
 
 // Функция для декодирования кириллицы в заголовке запроса
 function decodeCyrillic(str: string) {
     if (str.includes("s=")) {
-        console.log('Before encoding 1', str)
-        let str2 = str
-        // Декодируем строку в формате URL
-        str = decodeURIComponent(str)
-        console.log('Before encoding 2', str)
-        // Преобразуем строку в буфер
-        const buffer = Buffer.from(str, 'utf-8')
-        // Декодируем из Windows-1251
-        str = iconv.decode(buffer, 'windows-1251')
-        console.log('Before encoding 3', str)
-        const buffer2 = Buffer.from(str2, 'binary')
-        str2 = iconv.decode(buffer2, 'windows-1251')
-        console.log('Before encoding 4', str2)
-        // Словарь символов Windows-1251
         const cyrillicMap: { [key: string]: string } = {
             '%20': '+',
             '%E0': 'а',
@@ -209,7 +181,6 @@ function decodeCyrillic(str: string) {
             '%DE': 'Ю',
             '%DF': 'Я',
         }
-        // Замена всех закодированных символов
         str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
         console.log('Search:', str.replace(/^.*s=/, ""))
     }
