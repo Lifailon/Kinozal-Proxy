@@ -30,11 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
-        'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
+        // 'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
-        'content-type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || '',
         'priority': Array.isArray(headers['priority']) ? headers['priority'][0] : headers['priority'] || '',
         'sec-ch-ua': Array.isArray(headers['sec-ch-ua']) ? headers['sec-ch-ua'][0] : headers['sec-ch-ua'] || '',
         'sec-ch-ua-mobile': Array.isArray(headers['sec-ch-ua-mobile']) ? headers['sec-ch-ua-mobile'][0] : headers['sec-ch-ua-mobile'] || '',
