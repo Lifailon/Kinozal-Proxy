@@ -13,11 +13,10 @@ const jar = new CookieJar()
 // Интегрируем fetch с CookieJar
 const fetch = fetchCookie(nodeFetch, jar)
 
-//////////////////////////////////////////////////////////////////
-
-const baseUrl = "https://kinozal.vercel.app"
-
-//////////////////////////////////////////////////////////////////
+const baseUrl = "https://kinozal.tv"
+// const baseUrl = "https://kinozal.me"
+// const baseUrl = "https://kinozal.vercel.app"
+// const baseUrl = "https://kinozal-proxy.vercel.app"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method, headers, body } = req
