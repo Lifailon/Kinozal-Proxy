@@ -3,7 +3,7 @@ import https from 'https'
 import nodeFetch from 'node-fetch'
 import fetchCookie from 'fetch-cookie'
 import { CookieJar } from 'tough-cookie'
-const iconv = require('iconv-lite')
+import iconv from 'iconv-lite'
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
@@ -60,7 +60,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Декодируем кириллицу для поисковых запросов
-    const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
+    let decodedUrl = ''
+
+    if (req.url) {
+        try {
+            // Проверяем, содержит ли URL закодированные символы (например, %xx)
+            if (/%[0-9A-Fa-f]{2}/.test(req.url)) {
+                decodedUrl = decodeURIComponent(req.url)
+            } else {
+                decodedUrl = req.url // Уже декодировано
+            }
+        } catch (error) {
+            console.error('Ошибка при декодировании URL:', error)
+            decodedUrl = req.url // Возвращаем оригинальный URL в случае ошибки
+        }
+    } else {
+        console.error('URL отсутствует в запросе')
+    }
+    console.log('Decoded URL:', decodedUrl)
+    const decodeUrl = `${baseUrl}${decodedUrl}`
+
+    if (req.url) {
+        const decodederUrl = iconv.decode(Buffer.from(req.url, 'binary'), 'windows-1251')
+        console.log('Decoded URL via iconv from binary:', decodederUrl)
+    }
+
+    if (req.url) {
+        const decodederUrl = iconv.decode(Buffer.from(req.url, 'utf-8'), 'windows-1251')
+        console.log('Decoded URL via iconv from utf-8:', decodederUrl)
+    }
 
     try {
         // Запрос к серверу
