@@ -3,7 +3,7 @@ import https from 'https'
 import nodeFetch from 'node-fetch'
 import fetchCookie from 'fetch-cookie'
 import { CookieJar } from 'tough-cookie'
-const iconv = require('iconv-lite');
+const iconv = require('iconv-lite')
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
@@ -24,11 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { method, headers, body } = req
 
     // Пропускаем только curl/* для клиентов Kinozal-Bot
-    const userAgent = headers['user-agent'] || '';
+    const userAgent = headers['user-agent'] || ''
     if (!userAgent.includes('curl/')) {
         console.log('Access denied for agent:', userAgent)
-        res.status(403).send('Access denied: only curl agent');
-        return;
+        res.status(403).send('Access denied: only curl agent')
+        return
     }
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
@@ -101,11 +101,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 function decodeCyrillic(str: string) {
     if (str.includes("s=")) {
         console.log('Before encoding 1', str)
-        // Преобразуем строку в буфер
-        const buffer = Buffer.from(str, 'utf-8');
-        // Декодируем из Windows-1251
-        str = iconv.decode(buffer, 'windows-1251');
+        let str2 = str
+        // Декодируем строку в формате URL
+        str = decodeURIComponent(str)
         console.log('Before encoding 2', str)
+        // Преобразуем строку в буфер
+        const buffer = Buffer.from(str, 'utf-8')
+        // Декодируем из Windows-1251
+        str = iconv.decode(buffer, 'windows-1251')
+        console.log('Before encoding 3', str)
+        const buffer2 = Buffer.from(str2, 'binary')
+        str2 = iconv.decode(buffer2, 'windows-1251')
+        console.log('Before encoding 4', str2)
         // Словарь символов Windows-1251
         const cyrillicMap: { [key: string]: string } = {
             '%20': '+',
@@ -176,7 +183,7 @@ function decodeCyrillic(str: string) {
         }
         // Замена всех закодированных символов
         str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
-        console.log('Search:', str.replace(/^.*s=/, ""));
+        console.log('Search:', str.replace(/^.*s=/, ""))
     }
     return str
 }
