@@ -100,10 +100,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 // Функция для декодирования кириллицы в заголовке запроса
 function decodeCyrillic(str: string) {
     if (str.includes("s=")) {
+        console.log('Before encoding 1', str)
         // Преобразуем строку в буфер
-        const buffer = Buffer.from(str, 'binary');
+        const buffer = Buffer.from(str, 'utf-8');
         // Декодируем из Windows-1251
         str = iconv.decode(buffer, 'windows-1251');
+        console.log('Before encoding 2', str)
         // Словарь символов Windows-1251
         const cyrillicMap: { [key: string]: string } = {
             '%20': '+',

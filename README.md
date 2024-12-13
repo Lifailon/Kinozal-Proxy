@@ -30,5 +30,5 @@ KZ_ADDR="https://kinozal.vercel.app"
 To access the mirror from your web browser, you can use [UserAgent-Switcher](https://github.com/ray-lothian/UserAgent-Switcher) and import the example configuration in the extension settings:
 
 ```
-https://github.com/Lifailon/Kinozal-Proxy/blob/rsa/useragent-switcher.json
+https://raw.githubusercontent.com/Lifailon/Kinozal-Proxy/refs/heads/rsa/user-agent-switcher.json
 ```
