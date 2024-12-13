@@ -31,10 +31,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
         // 'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded',
-        'Content-Type': 'Content-Type: text/html; charset=utf-8',
+        'Content-Type': 'text/html; charset=windows-1251',
+        // 'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
+        'Accept': 'text/html',
+        // 'accept-language': Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language'] || '',
+        'Accept-Language': 'ru,ru-RU;q=0.9,en;q=0.8',
+        'Accept-Charset': 'utf-8, windows-1251;q=0.9',
+        // 'Accept-Encoding': '',
+        // 'Accept-Encoding': Array.isArray(headers['accept-encoding']) ? headers['cookie'][0] : headers['cookie'] || '',
+        // 'accept-encoding': 'gzip, deflate',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
-        'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
-        'accept-language': Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
         'content-type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || '',
         'priority': Array.isArray(headers['priority']) ? headers['priority'][0] : headers['priority'] || '',
@@ -49,6 +55,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Referer': Array.isArray(headers['referer']) ? headers['referer'][0] : headers['referer'] || '',
         'Referrer-Policy': Array.isArray(headers['referrer-policy']) ? headers['referrer-policy'][0] : headers['referrer-policy'] || '',
     }
+
+    delete headers['accept-encoding'];
+    delete requestHeaders['accept-encoding'];
 
     // Если есть тело запроса, то преобразуем его в строку
     let authString: string | undefined
@@ -68,6 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
         console.log('Headers:', req.headers)
         console.log('Referer:', req.headers?.referer)
+        console.log('Test:', encodeURIComponent('тест'))
     }
     
     try {
