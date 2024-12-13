@@ -9,12 +9,16 @@
     },
     "dependencies": {
         "fetch-cookie": "^3.0.1",
-        "next": "15.1.0",
-        "node-fetch": "^3.3.2"
+        "next": "^15.1.0",
+        "node-fetch": "^3.3.2",
+        "tough-cookie": "^5.0.0"
     },
     "devDependencies": {
+        "@types/next": "^9.0.0",
         "@types/node": "^18.0.0",
+        "@types/node-fetch": "^2.6.12",
         "@types/react": "^18.0.0",
+        "@types/tough-cookie": "^4.0.5",
         "typescript": "^5.0.0"
     }
 }
