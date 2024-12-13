@@ -1,6 +1,8 @@
 ## Kinozal-Proxy
 
-This is a serverless function for running a mirror to the Kinozal torrent tracker using [Next.js](https://nextjs.org). The proxy was created to access the tracker in the [Kinozal-Bot](https://github.com/Lifailon/Kinozal-Bot) project without using a VPN.
+This is a serverless function for running a mirror to the Kinozal torrent tracker using [Next.js](https://nextjs.org).
+
+The proxy was created to access the tracker in the [Kinozal-Bot](https://github.com/Lifailon/Kinozal-Bot) project without using a VPN, for this reason, there is an access restriction at the level of checking the agent used when sending requests.
 
 It is recommended to launch your application from the original Kinozal-Proxy repository, in order to avoid unnecessary load on one copy and keep your authorization data in the tracker.
 

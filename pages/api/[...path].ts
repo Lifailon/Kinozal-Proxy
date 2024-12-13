@@ -3,10 +3,12 @@ import https from 'https'
 import nodeFetch from 'node-fetch'
 import fetchCookie from 'fetch-cookie'
 import { CookieJar } from 'tough-cookie'
+const iconv = require('iconv-lite');
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
 // https://github.com/salesforce/tough-cookie
+// if (response.status === 302) { const location = response.headers.get('Location') }
 
 // Создаем CookieJar для хранения куков
 const jar = new CookieJar()
@@ -20,6 +22,14 @@ const baseUrl = "https://kinozal.tv"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method, headers, body } = req
+
+    // Пропускаем только curl/* для клиентов Kinozal-Bot
+    const userAgent = headers['user-agent'] || '';
+    if (!userAgent.includes('curl/')) {
+        console.log('Access denied for agent:', userAgent)
+        res.status(403).send('Access denied: only curl agent');
+        return;
+    }
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
@@ -87,9 +97,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 }
 
-// Функция для декодируем кириллицы в заголовке запроса
+// Функция для декодирования кириллицы в заголовке запроса
 function decodeCyrillic(str: string) {
     if (str.includes("s=")) {
+        // Преобразуем строку в буфер
+        const buffer = Buffer.from(str, 'binary');
+        // Декодируем из Windows-1251
+        str = iconv.decode(buffer, 'windows-1251');
         // Словарь символов Windows-1251
         const cyrillicMap: { [key: string]: string } = {
             '%20': '+',
@@ -160,7 +174,7 @@ function decodeCyrillic(str: string) {
         }
         // Замена всех закодированных символов
         str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
-        console.log("Search:", str.replace(/^.*s=/, ""));
+        console.log('Search:', str.replace(/^.*s=/, ""));
     }
     return str
 }
