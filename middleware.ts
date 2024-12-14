@@ -7,92 +7,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(rewriteUrl)
 }
 
-function decodeWinToUTF(str: string) {
-    if (str.includes("s=")) {
-        console.log('Search input string:', str)
-        const cyrillicMap: { [key: string]: string } = {
-            '%E0': '%D0%B0', // а
-            '%E1': '%D0%B1', // б
-            '%E2': '%D0%B2', // в
-            '%E3': '%D0%B3', // г
-            '%E4': '%D0%B4', // д
-            '%E5': '%D0%B5', // е
-            '%F1': '%D1%81', // с
-            '%E6': '%D0%B6', // ж
-            '%E7': '%D0%B7', // з
-            '%E8': '%D0%B8', // и
-            '%E9': '%D0%B9', // й
-            '%EA': '%D0%BA', // к
-            '%EB': '%D0%BB', // л
-            '%EC': '%D0%BC', // м
-            '%ED': '%D0%BD', // н
-            '%EE': '%D0%BE', // о
-            '%EF': '%D0%BF', // п
-            '%F0': '%D1%80', // р
-            '%F2': '%D1%82', // т
-            '%F3': '%D1%83', // у
-            '%F4': '%D1%84', // ф
-            '%F5': '%D1%85', // х
-            '%F6': '%D1%86', // ц
-            '%F7': '%D1%87', // ч
-            '%F8': '%D1%88', // ш
-            '%F9': '%D1%89', // щ
-            '%FA': '%D1%8B', // ы
-            '%FB': '%D1%8D', // э
-            '%FC': '%D1%8E', // ю
-            '%FD': '%D1%8F', // я
-            '%FF': '%D1%91', // ё
-            '%C0': '%D0%90', // А
-            '%C1': '%D0%91', // Б
-            '%C2': '%D0%92', // В
-            '%C3': '%D0%93', // Г
-            '%C4': '%D0%94', // Д
-            '%C5': '%D0%95', // Е
-            '%C6': '%D0%96', // Ж
-            '%C7': '%D0%97', // З
-            '%C8': '%D0%98', // И
-            '%C9': '%D0%99', // Й
-            '%CA': '%D0%9A', // К
-            '%CB': '%D0%9B', // Л
-            '%CC': '%D0%9C', // М
-            '%CD': '%D0%9D', // Н
-            '%CE': '%D0%9E', // О
-            '%CF': '%D0%9F', // П
-            '%D0': '%D1%80', // р
-            '%D1': '%D1%81', // с
-            '%D2': '%D1%82', // т
-            '%D3': '%D1%83', // у
-            '%D4': '%D1%84', // ф
-            '%D5': '%D1%85', // х
-            '%D6': '%D1%86', // ц
-            '%D7': '%D1%87', // ч
-            '%D8': '%D1%88', // ш
-            '%D9': '%D1%89', // щ
-            '%DA': '%D1%8B', // ы
-            '%DB': '%D1%8D', // э
-            '%DC': '%D1%8E', // ю
-            '%DD': '%D1%8F', // я
-        }
-        // const regex = /%[A-F0-9]{2}/g
-        const regex = /s=([^&]*%[A-F0-9]{2})/g
-        let encode = ''
-        let decode = ''
-        if (regex.test(str)) {
-            const matches = str.match(regex) || []
-            for (let m of matches) {
-                encode += m
-                decode += cyrillicMap[m]
-            }
-        }
-        str = str.replace(encode, decode)
-        console.log('Search output string:', str)
-    }
-    return str
-}
-
 function decodeCyrillic(str: string) {
     if (str.includes("s=")) {
-        const cyrillicMap: { [key: string]: string } = {
+        const winMap: { [key: string]: string } = {
             '%20': '+',
             '%E0': 'а',
             '%E1': 'б',
@@ -159,8 +76,30 @@ function decodeCyrillic(str: string) {
             '%DE': 'Ю',
             '%DF': 'Я',
         }
-        str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
+        const utfMap: { [key: string]: string } = {
+            'а': '%D0%B0', 'б': '%D0%B1', 'в': '%D0%B2', 'г': '%D0%B3', 'д': '%D0%B4',
+            'е': '%D0%B5', 'ё': '%D1%91', 'ж': '%D0%B6', 'з': '%D0%B7', 'и': '%D0%B8',
+            'й': '%D0%B9', 'к': '%D0%BA', 'л': '%D0%BB', 'м': '%D0%BC', 'н': '%D0%BD',
+            'о': '%D0%BE', 'п': '%D0%BF', 'р': '%D1%80', 'с': '%D1%81', 'т': '%D1%82',
+            'у': '%D1%83', 'ф': '%D1%84', 'х': '%D1%85', 'ц': '%D1%86', 'ч': '%D1%87',
+            'ш': '%D1%88', 'щ': '%D1%89', 'ъ': '%D1%8A', 'ы': '%D1%8B', 'ь': '%D1%8C',
+            'э': '%D1%8D', 'ю': '%D1%8E', 'я': '%D1%8F',
+            'А': '%D0%90', 'Б': '%D0%91', 'В': '%D0%92', 'Г': '%D0%93', 'Д': '%D0%94',
+            'Е': '%D0%95', 'Ё': '%D0%81', 'Ж': '%D0%96', 'З': '%D0%97', 'И': '%D0%98',
+            'Й': '%D0%99', 'К': '%D0%9A', 'Л': '%D0%9B', 'М': '%D0%9C', 'Н': '%D0%9D',
+            'О': '%D0%9E', 'П': '%D0%9F', 'Р': '%D0%A0', 'С': '%D0%A1', 'Т': '%D0%A2',
+            'У': '%D0%A3', 'Ф': '%D0%A4', 'Х': '%D0%A5', 'Ц': '%D0%A6', 'Ч': '%D0%A7',
+            'Ш': '%D0%A8', 'Щ': '%D0%A9', 'Ъ': '%D0%AA', 'Ы': '%D0%AB', 'Ь': '%D0%AC',
+            'Э': '%D0%AD', 'Ю': '%D0%AE', 'Я': '%D0%AF'
+        }
+        str = str.replace(/%[A-F0-9]{2}/g, (match) => winMap[match] || match)
+        str = str.replace(/%[а-яА-Я]/g, (match) => utfMap[match] || match)
         console.log('Search:', str.replace(/^.*s=/, ""))
     }
     return str
 }
+
+// npm install -g typescript
+// tsc .\middleware.ts
+// node .\middleware.ts
+// decodeCyrillic('s=%F2%E5%F1%F2')
