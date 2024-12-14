@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import iconv from 'iconv-lite'  // Подключаем iconv для работы с кодировками
 
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
@@ -11,8 +10,9 @@ export function middleware(req: NextRequest) {
         console.log('Original search param:', searchParam)
 
         try {
-            // Декодируем параметр как windows-1251 с помощью iconv-lite
-            const decodedSearch = iconv.decode(Buffer.from(searchParam || '', 'binary'), 'windows-1251')
+            // Декодируем строку как Windows-1251 с помощью TextDecoder
+            const decoder = new TextDecoder('windows-1251')
+            const decodedSearch = decoder.decode(new Uint8Array(Buffer.from(searchParam || '', 'hex')))
             console.log('Decoded search param (Windows-1251):', decodedSearch)
 
             // Преобразуем строку в формат URL-encoded
