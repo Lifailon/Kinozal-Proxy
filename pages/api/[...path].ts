@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Формируем заголовки для переноса их в запрос к целевому серверу
     const requestHeaders: Record<string, string> = {
-        'Content-Type': Array.isArray(headers['content-type']) ? headers['content-type'][0] : headers['content-type'] || 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'accept': Array.isArray(headers['accept']) ? headers['accept'][0] : headers['accept'] || '',
         'cookie': Array.isArray(headers['cookie']) ? headers['cookie'][0] : headers['cookie'] || '',
         'cache-control': Array.isArray(headers['cache-control']) ? headers['cache-control'][0] : headers['cache-control'] || '',
@@ -59,14 +59,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
-        console.log('Search path:', requestSearch)
-        console.log('Search query:', req.query.s)
+        console.log('Query path:', requestSearch)
+        console.log('Query search:', req.query.s)
         // console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
         // console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
-        console.log('env', req.env)
-        console.log('rawHeaders', req.rawHeaders)
-        console.log('socket', req.socket)
-    }
+   }
     
     try {
         // Запрос к серверу
@@ -104,80 +101,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.error('Error request:', error)
         res.status(500).send('Error request: destination server not available')
     }
-}
-
-// Функция для декодирования кириллицы в заголовке запроса
-function decodeCyrillic(str: string) {
-    if (str.includes("s=")) {
-        const cyrillicMap: { [key: string]: string } = {
-            '%20': '+',
-            '%E0': 'а',
-            '%E1': 'б',
-            '%E2': 'в',
-            '%E3': 'г',
-            '%E4': 'д',
-            '%E5': 'е',
-            '%E6': 'ж',
-            '%E7': 'з',
-            '%E8': 'и',
-            '%E9': 'й',
-            '%EA': 'к',
-            '%EB': 'л',
-            '%EC': 'м',
-            '%ED': 'н',
-            '%EE': 'о',
-            '%EF': 'п',
-            '%F0': 'р',
-            '%F1': 'с',
-            '%F2': 'т',
-            '%F3': 'у',
-            '%F4': 'ф',
-            '%F5': 'х',
-            '%F6': 'ц',
-            '%F7': 'ч',
-            '%F8': 'ш',
-            '%F9': 'щ',
-            '%FA': 'ъ',
-            '%FB': 'ы',
-            '%FC': 'ь',
-            '%FD': 'э',
-            '%FE': 'ю',
-            '%FF': 'я',
-            '%C0': 'А',
-            '%C1': 'Б',
-            '%C2': 'В',
-            '%C3': 'Г',
-            '%C4': 'Д',
-            '%C5': 'Е',
-            '%C6': 'Ж',
-            '%C7': 'З',
-            '%C8': 'И',
-            '%C9': 'Й',
-            '%CA': 'К',
-            '%CB': 'Л',
-            '%CC': 'М',
-            '%CD': 'Н',
-            '%CE': 'О',
-            '%CF': 'П',
-            '%D0': 'Р',
-            '%D1': 'С',
-            '%D2': 'Т',
-            '%D3': 'У',
-            '%D4': 'Ф',
-            '%D5': 'Х',
-            '%D6': 'Ц',
-            '%D7': 'Ч',
-            '%D8': 'Ш',
-            '%D9': 'Щ',
-            '%DA': 'Ъ',
-            '%DB': 'Ы',
-            '%DC': 'Ь',
-            '%DD': 'Э',
-            '%DE': 'Ю',
-            '%DF': 'Я',
-        }
-        str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
-        console.log('Search:', str.replace(/^.*s=/, ""))
-    }
-    return str
 }
