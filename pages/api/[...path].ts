@@ -50,10 +50,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let authString: string | undefined
     if (body) {
         authString = new URLSearchParams(body as Record<string, string>).toString()
-        console.log('Body:', authString)
+        console.log('Auth body:', authString)
     }
 
-    console.log('Request url:', req.url)
     // Логируем поисковые запросы
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
