@@ -64,7 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
         // console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
         console.log('env', req.env)
-        console.log('initURL', req.initURL)
         console.log('rawHeaders', req.rawHeaders)
         console.log('socket', req.socket)
     }
