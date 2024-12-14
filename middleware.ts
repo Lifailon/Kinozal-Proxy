@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+// import { NextRequest, NextResponse } from 'next/server'
 
-export function middleware(req: NextRequest) {
-    const rewriteUrl = req.nextUrl.clone()
-    rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
-    rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
-    return NextResponse.rewrite(rewriteUrl)
-}
+// export function middleware(req: NextRequest) {
+//     const rewriteUrl = req.nextUrl.clone()
+//     rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
+//     rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
+//     return NextResponse.rewrite(rewriteUrl)
+// }
 
 function decodeCyrillic(str: string, search: boolean) {
     if (str.includes("s=")) {
@@ -93,7 +93,7 @@ function decodeCyrillic(str: string, search: boolean) {
             'Э': '%D0%AD', 'Ю': '%D0%AE', 'Я': '%D0%AF'
         }
         str = str.replace(/%[A-F0-9]{2}/g, (match) => winMap[match] || match)
-        str = str.replace(/%[а-яА-Я]/g, (match) => utfMap[match] || match)
+        str = str.replace(/[а-яА-Я]/g, (match) => utfMap[match] || match)
         console.log('Search:', str.replace(/^.*s=/, ""))
     }
     if (search) {
@@ -105,4 +105,4 @@ function decodeCyrillic(str: string, search: boolean) {
 // npm install -g typescript
 // tsc .\middleware.ts
 // node .\middleware.ts
-// decodeCyrillic('s=%F2%E5%F1%F2')
+// decodeCyrillic('s=%F2%E5%F1%F2', true)
