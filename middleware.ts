@@ -1,20 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
+import iconv from 'iconv-lite'
 
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
     console.log('Request URL:', req.url)
     console.log('Next URL:', req.nextUrl)
+
     if (url.searchParams.has('s')) {
         const searchParam = url.searchParams.get('s')
         console.log('Original search param:', searchParam)
+
         try {
-            const decodedSearch = decodeURIComponent(searchParam || '')
+            // Декодируем как Windows-1251
+            const buffer = Buffer.from(searchParam, 'hex')
+            const decodedSearch = iconv.decode(buffer, 'windows-1251')
+
+            // Перекодируем в UTF-8 и затем в URL-encoded
+            const encodedSearch = encodeURIComponent(decodedSearch)
+
             console.log('Decoded search param (UTF-8):', decodedSearch)
-            url.searchParams.set('s', decodedSearch)
+            console.log('Encoded search param (URL-encoded):', encodedSearch)
+
+            url.searchParams.set('s', encodedSearch)
         } catch (error) {
-            console.error(error)
+            console.error('Error during decoding:', error)
         }
     }
+
     console.log('Rewritten URL:', url)
     return NextResponse.rewrite(url)
 }
