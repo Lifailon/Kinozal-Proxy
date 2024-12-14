@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import iconv from 'iconv-lite'
+import iconv from 'iconv-lite'  // Подключаем iconv для работы с кодировками
 
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
@@ -8,26 +8,21 @@ export function middleware(req: NextRequest) {
 
     if (url.searchParams.has('s')) {
         const searchParam = url.searchParams.get('s')
+        console.log('Original search param:', searchParam)
 
-        // Проверяем, что параметр существует
-        if (searchParam) {
-            console.log('Original search param:', searchParam)
+        try {
+            // Декодируем параметр как windows-1251 с помощью iconv-lite
+            const decodedSearch = iconv.decode(Buffer.from(searchParam || '', 'binary'), 'windows-1251')
+            console.log('Decoded search param (Windows-1251):', decodedSearch)
 
-            try {
-                // Декодируем строку как windows-1251 с помощью iconv-lite
-                const decodedSearch = iconv.decode(Buffer.from(searchParam, 'binary'), 'windows-1251')
-                console.log('Decoded search param (Windows-1251):', decodedSearch)
+            // Преобразуем строку в формат URL-encoded
+            const encodedSearch = encodeURIComponent(decodedSearch)
+            console.log('Encoded search param (URL-encoded):', encodedSearch)
 
-                // Перекодируем в UTF-8
-                const encodedSearch = encodeURIComponent(decodedSearch)
-                console.log('Encoded search param (URL-encoded):', encodedSearch)
-
-                url.searchParams.set('s', encodedSearch)
-            } catch (error) {
-                console.error('Error during decoding:', error)
-            }
-        } else {
-            console.warn('Search param "s" is null or empty.')
+            // Устанавливаем откодированный параметр обратно в URL
+            url.searchParams.set('s', encodedSearch)
+        } catch (error) {
+            console.error('Error during decoding:', error)
         }
     }
 
