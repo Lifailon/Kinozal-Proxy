@@ -78,7 +78,7 @@ function decodeWinToUTF(str: string) {
             '%DC': '%D1%8E', // ю
             '%DD': '%D1%8F', // я
         }
-        str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
+        str = str.replace(/%[A-F0-9]{2}/g, match => cyrillicMap[match] || match);
     }
     return str
 }
