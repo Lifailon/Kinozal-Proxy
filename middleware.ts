@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
     const rewriteUrl = req.nextUrl.clone()
-    rewriteUrl.href = decodeWinToUTF(rewriteUrl.href)
-    rewriteUrl.search = decodeWinToUTF(rewriteUrl.search)
+    rewriteUrl.href = decodeCyrillic(rewriteUrl.href)
+    rewriteUrl.search = decodeCyrillic(rewriteUrl.search)
     return NextResponse.rewrite(rewriteUrl)
 }
 
