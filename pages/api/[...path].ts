@@ -83,6 +83,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.setHeader('Set-Cookie', cookieHeaders)
         }
 
+        console.log('Response url:', response.url)
+
         // Возвращяем ответ клиенту через pipe по частям (без загрузки памяти)
         res.status(response.status)
         if (response.body) {

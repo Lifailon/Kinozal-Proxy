@@ -8,17 +8,17 @@ It is recommended to launch your application from this is repository to avoid un
 
 The proxy is not universal and needs improvement to proxy to other domains.
 
-## 🔼 Deploy on Vercel
+## 🔼 Deploy
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Using the button below and following the instructions:
+Use the button below and following the instructions:
 
 [![Vercel](https://img.shields.io/badge/Deploy-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/new/torapi/clone?repository-url=https://github.com/lifailon/Kinozal-Proxy)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Using
+## 🚀 Using
 
 To use a mirror in the [Kinozal-Bot](https://github.com/Lifailon/Kinozal-Bot) project, disable the proxy and change the server address:
 
