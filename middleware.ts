@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import iconv from 'iconv-lite'
 
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
@@ -14,9 +13,9 @@ export function middleware(req: NextRequest) {
             console.log('Original search param:', searchParam)
 
             try {
-                // Декодируем как Windows-1251
-                const buffer = Buffer.from(searchParam, 'utf-8') // Преобразуем строку в буфер
-                const decodedSearch = iconv.decode(buffer, 'windows-1251')
+                // Используем TextDecoder для Windows-1251
+                const buffer = new TextEncoder().encode(searchParam)
+                const decodedSearch = new TextDecoder('windows-1251').decode(buffer)
 
                 // Перекодируем в UTF-8 и затем в URL-encoded
                 const encodedSearch = encodeURIComponent(decodedSearch)
