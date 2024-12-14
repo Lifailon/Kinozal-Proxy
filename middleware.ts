@@ -4,11 +4,15 @@ export function middleware(req: NextRequest) {
     const rewriteUrl = req.nextUrl.clone()
     rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
     rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
+
     return NextResponse.rewrite(rewriteUrl)
 }
 
 function decodeCyrillic(str: string, search: boolean) {
     if (str.includes("s=")) {
+        if (search) {
+            str =  str.replace(/.+s=/, "").replace(/&.+/, "")
+        }
         const winMap: { [key: string]: string } = {
             '%20': '+',
             '%E0': 'а',
@@ -77,32 +81,83 @@ function decodeCyrillic(str: string, search: boolean) {
             '%DF': 'Я',
         }
         const utfMap: { [key: string]: string } = {
-            'а': '%D0%B0', 'б': '%D0%B1', 'в': '%D0%B2', 'г': '%D0%B3', 'д': '%D0%B4',
-            'е': '%D0%B5', 'ё': '%D1%91', 'ж': '%D0%B6', 'з': '%D0%B7', 'и': '%D0%B8',
-            'й': '%D0%B9', 'к': '%D0%BA', 'л': '%D0%BB', 'м': '%D0%BC', 'н': '%D0%BD',
-            'о': '%D0%BE', 'п': '%D0%BF', 'р': '%D1%80', 'с': '%D1%81', 'т': '%D1%82',
-            'у': '%D1%83', 'ф': '%D1%84', 'х': '%D1%85', 'ц': '%D1%86', 'ч': '%D1%87',
-            'ш': '%D1%88', 'щ': '%D1%89', 'ъ': '%D1%8A', 'ы': '%D1%8B', 'ь': '%D1%8C',
-            'э': '%D1%8D', 'ю': '%D1%8E', 'я': '%D1%8F',
-            'А': '%D0%90', 'Б': '%D0%91', 'В': '%D0%92', 'Г': '%D0%93', 'Д': '%D0%94',
-            'Е': '%D0%95', 'Ё': '%D0%81', 'Ж': '%D0%96', 'З': '%D0%97', 'И': '%D0%98',
-            'Й': '%D0%99', 'К': '%D0%9A', 'Л': '%D0%9B', 'М': '%D0%9C', 'Н': '%D0%9D',
-            'О': '%D0%9E', 'П': '%D0%9F', 'Р': '%D0%A0', 'С': '%D0%A1', 'Т': '%D0%A2',
-            'У': '%D0%A3', 'Ф': '%D0%A4', 'Х': '%D0%A5', 'Ц': '%D0%A6', 'Ч': '%D0%A7',
-            'Ш': '%D0%A8', 'Щ': '%D0%A9', 'Ъ': '%D0%AA', 'Ы': '%D0%AB', 'Ь': '%D0%AC',
-            'Э': '%D0%AD', 'Ю': '%D0%AE', 'Я': '%D0%AF'
+            'а': '%D0%B0',
+            'б': '%D0%B1',
+            'в': '%D0%B2',
+            'г': '%D0%B3',
+            'д': '%D0%B4',
+            'е': '%D0%B5',
+            'ё': '%D1%91',
+            'ж': '%D0%B6',
+            'з': '%D0%B7',
+            'и': '%D0%B8',
+            'й': '%D0%B9',
+            'к': '%D0%BA',
+            'л': '%D0%BB',
+            'м': '%D0%BC',
+            'н': '%D0%BD',
+            'о': '%D0%BE',
+            'п': '%D0%BF',
+            'р': '%D1%80',
+            'с': '%D1%81',
+            'т': '%D1%82',
+            'у': '%D1%83',
+            'ф': '%D1%84',
+            'х': '%D1%85',
+            'ц': '%D1%86',
+            'ч': '%D1%87',
+            'ш': '%D1%88',
+            'щ': '%D1%89',
+            'ъ': '%D1%8A',
+            'ы': '%D1%8B',
+            'ь': '%D1%8C',
+            'э': '%D1%8D',
+            'ю': '%D1%8E',
+            'я': '%D1%8F',
+            'А': '%D0%90',
+            'Б': '%D0%91',
+            'В': '%D0%92',
+            'Г': '%D0%93',
+            'Д': '%D0%94',
+            'Е': '%D0%95',
+            'Ё': '%D0%81',
+            'Ж': '%D0%96',
+            'З': '%D0%97',
+            'И': '%D0%98',
+            'Й': '%D0%99',
+            'К': '%D0%9A',
+            'Л': '%D0%9B',
+            'М': '%D0%9C',
+            'Н': '%D0%9D',
+            'О': '%D0%9E',
+            'П': '%D0%9F',
+            'Р': '%D0%A0',
+            'С': '%D0%A1',
+            'Т': '%D0%A2',
+            'У': '%D0%A3',
+            'Ф': '%D0%A4',
+            'Х': '%D0%A5',
+            'Ц': '%D0%A6',
+            'Ч': '%D0%A7',
+            'Ш': '%D0%A8',
+            'Щ': '%D0%A9',
+            'Ъ': '%D0%AA',
+            'Ы': '%D0%AB',
+            'Ь': '%D0%AC',
+            'Э': '%D0%AD',
+            'Ю': '%D0%AE',
+            'Я': '%D0%AF'
         }
         str = str.replace(/%[A-F0-9]{2}/g, (match) => winMap[match] || match)
         str = str.replace(/[а-яА-Я]/g, (match) => utfMap[match] || match)
-        console.log('Search:', str.replace(/^.*s=/, ""))
-    }
-    if (search) {
-        return str.replace(/^.*s=/, "")
+        // console.log('Decode string:', str)
     }
     return str
 }
 
 // npm install -g typescript
-// tsc .\middleware.ts
-// node .\middleware.ts
-// decodeCyrillic('s=%F2%E5%F1%F2', true)
+// tsc .\middleware.ts && node .\middleware.js
+// const url = 'https://kinozal.tv/browse.php?s=%F2%E5%F1%F2&g=0&c=0&v=0&d=0&w=0&t=0&f=0'
+// decodeCyrillic(url, false)
+// decodeCyrillic(url, true)
+// %D1%82%D0%B5%D1%81%D1%82

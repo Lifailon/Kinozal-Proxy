@@ -53,8 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Body:', authString)
     }
 
-    // Декодируем кириллицу для поисковых запросов
-    // const decodeUrl = decodeCyrillic(`${baseUrl}${req.url}`)
+    console.log('Url:', req.url)
+    // Логируем поисковые запросы
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
