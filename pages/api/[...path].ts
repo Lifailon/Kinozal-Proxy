@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Body:', authString)
     }
 
-    console.log('Url:', req.url)
+    console.log('Request url:', req.url)
     // Логируем поисковые запросы
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {

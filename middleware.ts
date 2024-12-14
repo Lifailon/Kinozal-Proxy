@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
     const rewriteUrl = req.nextUrl.clone()
+    // console.log('Encode url:', rewriteUrl)
     rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
     rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
-
+    // console.log('Decode url:', rewriteUrl)
     return NextResponse.rewrite(rewriteUrl)
 }
 
 function decodeCyrillic(str: string, search: boolean) {
     if (str.includes("s=")) {
         if (search) {
-            str =  str.replace(/.+s=/, "").replace(/&.+/, "")
+            str =  str.replace(/.+s=/, "s=").replace(/&.+/, "")
         }
         const winMap: { [key: string]: string } = {
             '%20': '+',
@@ -150,8 +151,8 @@ function decodeCyrillic(str: string, search: boolean) {
         }
         str = str.replace(/%[A-F0-9]{2}/g, (match) => winMap[match] || match)
         str = str.replace(/[а-яА-Я]/g, (match) => utfMap[match] || match)
-        // console.log('Decode string:', str)
     }
+    // console.log('Decode string:', str)
     return str
 }
 
