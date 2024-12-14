@@ -3,7 +3,6 @@ import https from 'https'
 import nodeFetch from 'node-fetch'
 import fetchCookie from 'fetch-cookie'
 import { CookieJar } from 'tough-cookie'
-import iconv from 'iconv-lite'
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
@@ -61,9 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const requestSearch = req.url.replace(/^.*s=/, "")
         console.log('Query path:', requestSearch)
         console.log('Query search:', req.query.s)
-        // console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
-        // console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
-   }
+    }
     
     try {
         // Запрос к серверу
