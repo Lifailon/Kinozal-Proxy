@@ -79,9 +79,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             redirect: 'follow',
         })
 
-        console.log('response url', response.url)
-        console.log('response headers', response.headers)
-
         // Получаем cookies текущего домена из CookieJar для последующих запросов
         const cookies = await jar.getCookies(`${baseUrl}${req.url}`)
         if (cookies.length > 0) {
