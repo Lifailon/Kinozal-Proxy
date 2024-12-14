@@ -1,11 +1,11 @@
-// import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-// export function middleware(req: NextRequest) {
-//     const rewriteUrl = req.nextUrl.clone()
-//     rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
-//     rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
-//     return NextResponse.rewrite(rewriteUrl)
-// }
+export function middleware(req: NextRequest) {
+    const rewriteUrl = req.nextUrl.clone()
+    rewriteUrl.href = decodeCyrillic(req.nextUrl.href, false)
+    rewriteUrl.search = decodeCyrillic(req.nextUrl.href, true)
+    return NextResponse.rewrite(rewriteUrl)
+}
 
 function decodeCyrillic(str: string, search: boolean) {
     if (str.includes("s=")) {
