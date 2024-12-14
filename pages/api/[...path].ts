@@ -58,8 +58,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
-        console.log('Query path:', requestSearch)
-        console.log('Query search:', req.query.s)
+        console.log('Search path:', requestSearch)
+        console.log('Search query:', req.query.s)
     }
     
     try {
