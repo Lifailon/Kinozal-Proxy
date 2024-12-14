@@ -59,11 +59,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const decodeUrl = `${baseUrl}${req.url}`
     if (req.url?.includes("s=")) {
         const requestSearch = req.url.replace(/^.*s=/, "")
-        console.log('Search query:', requestSearch)
-        console.log('Search query s:', req.query.s)
-        console.log('Search url param:', new URLSearchParams({ s: requestSearch }))
-        console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
-        console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
+        console.log('Search path:', requestSearch)
+        console.log('Search query:', req.query.s)
+        // console.log('Search query decode in utf-8:', Buffer.from(requestSearch, 'binary').toString('utf-8'))
+        // console.log('Search query decode in win-1251', iconv.decode(Buffer.from(requestSearch, 'binary'), 'windows-1251'))
+        console.log('env', req.env)
+        console.log('initURL', req.initURL)
+        console.log('rawHeaders', req.rawHeaders)
+        console.log('socket', req.socket)
     }
     
     try {
@@ -79,6 +82,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // Включаем перенаправление запросов для получения cookie из POST-запроса
             redirect: 'follow',
         })
+
+        console.log('response url', response.url)
+        console.log('response headers', response.headers)
 
         // Получаем cookies текущего домена из CookieJar для последующих запросов
         const cookies = await jar.getCookies(`${baseUrl}${req.url}`)
