@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Функция для ручного декодирования URL-encoded строки
+function decodeAndReencodeManually(urlEncodedString: string): string {
+    // Разбиваем строку на пары символов (например, %F2, %E5)
+    const hexArray: string[] = urlEncodedString.match(/%[0-9A-F]{2}/g) || [];
+
+    // Мапим каждый символ из hex-формата в соответствующий символ UTF-8
+    const decodedString: string = hexArray.map((hex: string) => {
+        // Получаем десятичное значение из шестнадцатиричной строки
+        const charCode = parseInt(hex.substring(1), 16);
+
+        // Возвращаем символ по кодовому значению
+        return String.fromCharCode(charCode);
+    }).join('');
+    
+    // Теперь, когда строка декодирована, кодируем её обратно в URL-формат
+    const reencodedString: string = encodeURIComponent(decodedString);
+    
+    return reencodedString;
+}
+
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()
     console.log('Request URL:', req.url)
@@ -10,19 +30,14 @@ export function middleware(req: NextRequest) {
         console.log('Original search param:', searchParam)
 
         try {
-            // Декодируем строку как Windows-1251 с помощью TextDecoder
-            const buffer = Buffer.from(searchParam || '', 'utf-8') // Корректно конвертируем строку в буфер
-            const decoder = new TextDecoder('windows-1251') // Используем TextDecoder для кодировки windows-1251
-            const decodedSearch = decoder.decode(buffer) // Декодируем буфер
-            console.log('Decoded search param (Windows-1251):', decodedSearch)
-
-            // Преобразуем строку обратно в URL-кодировку
-            const encodedSearch = encodeURIComponent(decodedSearch)
-            console.log('Encoded search param (URL-encoded):', encodedSearch)
-
-            url.searchParams.set('s', encodedSearch)
+            // Используем вручную написанную функцию для декодирования и повторной кодировки строки
+            const reencodedSearch = decodeAndReencodeManually(searchParam || '')
+            console.log('Reencoded search param (URL-encoded):', reencodedSearch)
+            
+            // Устанавливаем заново закодированное значение параметра
+            url.searchParams.set('s', reencodedSearch)
         } catch (error) {
-            console.error('Error during decoding:', error)
+            console.error(error)
         }
     }
 
