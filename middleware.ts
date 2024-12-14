@@ -11,15 +11,15 @@ export function middleware(req: NextRequest) {
 
         try {
             // Декодируем строку как Windows-1251 с помощью TextDecoder
-            const decoder = new TextDecoder('windows-1251')
-            const decodedSearch = decoder.decode(new Uint8Array(Buffer.from(searchParam || '', 'hex')))
+            const buffer = Buffer.from(searchParam || '', 'utf-8') // Корректно конвертируем строку в буфер
+            const decoder = new TextDecoder('windows-1251') // Используем TextDecoder для кодировки windows-1251
+            const decodedSearch = decoder.decode(buffer) // Декодируем буфер
             console.log('Decoded search param (Windows-1251):', decodedSearch)
 
-            // Преобразуем строку в формат URL-encoded
+            // Преобразуем строку обратно в URL-кодировку
             const encodedSearch = encodeURIComponent(decodedSearch)
             console.log('Encoded search param (URL-encoded):', encodedSearch)
 
-            // Устанавливаем откодированный параметр обратно в URL
             url.searchParams.set('s', encodedSearch)
         } catch (error) {
             console.error('Error during decoding:', error)
