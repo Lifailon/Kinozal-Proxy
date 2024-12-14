@@ -2,19 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
     const rewriteUrl = req.nextUrl.clone()
-    console.log('Input URL:', rewriteUrl)
     rewriteUrl.href = decodeWinToUTF(rewriteUrl.href)
     rewriteUrl.search = decodeWinToUTF(rewriteUrl.search)
-    console.log('Output URL:', rewriteUrl)
     return NextResponse.rewrite(rewriteUrl)
 }
 
-// "т е с т"
-// "%F2 %E5 %F1 %F2"
-// "%D1%82 %D0%B5 %D1%81 %D1%82"
-
 function decodeWinToUTF(str: string) {
     if (str.includes("s=")) {
+        console.log('Search input string:', str)
         const cyrillicMap: { [key: string]: string } = {
             '%E0': '%D0%B0', // а
             '%E1': '%D0%B1', // б
@@ -78,7 +73,94 @@ function decodeWinToUTF(str: string) {
             '%DC': '%D1%8E', // ю
             '%DD': '%D1%8F', // я
         }
-        str = str.replace(/%[A-F0-9]{2}/g, match => cyrillicMap[match] || match);
+        // const regex = /%[A-F0-9]{2}/g
+        const regex = /s=([^&]*%[A-F0-9]{2})/g
+        let encode = ''
+        let decode = ''
+        if (regex.test(str)) {
+            const matches = str.match(regex) || []
+            for (let m of matches) {
+                encode += m
+                decode += cyrillicMap[m]
+            }
+        }
+        str = str.replace(encode, decode)
+        console.log('Search output string:', str)
+    }
+    return str
+}
+
+function decodeCyrillic(str: string) {
+    if (str.includes("s=")) {
+        const cyrillicMap: { [key: string]: string } = {
+            '%20': '+',
+            '%E0': 'а',
+            '%E1': 'б',
+            '%E2': 'в',
+            '%E3': 'г',
+            '%E4': 'д',
+            '%E5': 'е',
+            '%E6': 'ж',
+            '%E7': 'з',
+            '%E8': 'и',
+            '%E9': 'й',
+            '%EA': 'к',
+            '%EB': 'л',
+            '%EC': 'м',
+            '%ED': 'н',
+            '%EE': 'о',
+            '%EF': 'п',
+            '%F0': 'р',
+            '%F1': 'с',
+            '%F2': 'т',
+            '%F3': 'у',
+            '%F4': 'ф',
+            '%F5': 'х',
+            '%F6': 'ц',
+            '%F7': 'ч',
+            '%F8': 'ш',
+            '%F9': 'щ',
+            '%FA': 'ъ',
+            '%FB': 'ы',
+            '%FC': 'ь',
+            '%FD': 'э',
+            '%FE': 'ю',
+            '%FF': 'я',
+            '%C0': 'А',
+            '%C1': 'Б',
+            '%C2': 'В',
+            '%C3': 'Г',
+            '%C4': 'Д',
+            '%C5': 'Е',
+            '%C6': 'Ж',
+            '%C7': 'З',
+            '%C8': 'И',
+            '%C9': 'Й',
+            '%CA': 'К',
+            '%CB': 'Л',
+            '%CC': 'М',
+            '%CD': 'Н',
+            '%CE': 'О',
+            '%CF': 'П',
+            '%D0': 'Р',
+            '%D1': 'С',
+            '%D2': 'Т',
+            '%D3': 'У',
+            '%D4': 'Ф',
+            '%D5': 'Х',
+            '%D6': 'Ц',
+            '%D7': 'Ч',
+            '%D8': 'Ш',
+            '%D9': 'Щ',
+            '%DA': 'Ъ',
+            '%DB': 'Ы',
+            '%DC': 'Ь',
+            '%DD': 'Э',
+            '%DE': 'Ю',
+            '%DF': 'Я',
+        }
+        str = str.replace(/%[A-F0-9]{2}/g, (match) => cyrillicMap[match] || match)
+        console.log('Search:', str.replace(/^.*s=/, ""))
     }
     return str
 }
