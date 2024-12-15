@@ -54,17 +54,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Auth body:', authString)
     }
 
+    // Формируем url для запроса к серверу
+    let requestUrl = `${baseUrl}${req.url}`
+
+    // Обновляем url для загрузки
+    if (requestUrl.includes("download.php?id=")) {
+        requestUrl = requestUrl.replace('kinozal.vercel.app','dl.kinozal.tv')
+    }
+
     // Логируем поисковые запросы
-    const decodeUrl = `${baseUrl}${req.url}`
-    if (req.url?.includes("s=")) {
-        const requestSearch = req.url.replace(/^.*s=/, "")
+    if (requestUrl.includes("s=")) {
+        const requestSearch = requestUrl.replace(/^.+s=/, "")
         console.log('Search path:', requestSearch)
         console.log('Search query:', req.query.s)
     }
-    
+
     try {
         // Запрос к серверу
-        const response = await fetch(decodeUrl, {
+        const response = await fetch(requestUrl, {
             // Передаем заголовки запроса от клиента к серверу
             headers: requestHeaders,
             // Проверяем метод и передаем тело запроса
