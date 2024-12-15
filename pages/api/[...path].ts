@@ -3,6 +3,7 @@ import https from 'https'
 import nodeFetch from 'node-fetch'
 import fetchCookie from 'fetch-cookie'
 import { CookieJar } from 'tough-cookie'
+import iconv from 'iconv-lite'
 
 // Используем библиотеки для обработки cookie при перенаправлении
 // https://github.com/valeriangalliat/fetch-cookie
@@ -83,7 +84,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.setHeader('Set-Cookie', cookieHeaders)
         }
 
-        console.log('Response url:', response.url)
+        // Обновляем url для загрузки на странице описания
+        if (req.url?.includes("details.php?id=")) {
+            let bodyBuffer = await response.arrayBuffer()
+            // Декодируем буфер в windows-1251
+            let body = iconv.decode(Buffer.from(bodyBuffer), 'win1251')
+            console.log(body)
+            // Заменяем url на странице
+            body = body.replace("dl.kinozal.tv", "kinozal.vercel.app")
+            // Кодируем буфер обратно
+            const modifiedBodyBuffer = iconv.encode(body, 'win1251')
+            res.setHeader('Content-Type', 'text/html; charset=windows-1251')
+            res.status(response.status).send(modifiedBodyBuffer)
+        }
 
         // Возвращяем ответ клиенту через pipe по частям (без загрузки памяти)
         res.status(response.status)

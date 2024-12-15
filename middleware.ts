@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
     const requestNextUrl = req.nextUrl.href
-    // Только для поисковых запросов
+    // Обновляем кодировку только для поисковых запросов
     if (requestNextUrl.includes("s=")) {
         const rewriteUrl = req.nextUrl.clone()
         // console.log('Encode url:', rewriteUrl)
         rewriteUrl.href = decodeCyrillic(requestNextUrl, false)
+        // Исходный параметр search содержит битые символы
         rewriteUrl.search = decodeCyrillic(requestNextUrl, true)
         // console.log('Decode url:', rewriteUrl)
         return NextResponse.rewrite(rewriteUrl)
@@ -14,10 +15,11 @@ export function middleware(req: NextRequest) {
     return
 }
 
-// Функция декодируем Windows-1251 в кириллицу и потом в UTF-8
+// Функция декодирования Windows-1251 в UTF-8
 function decodeCyrillic(str: string, search: boolean) {
+    // Удаляем все части url, оставляя только кодированные символы для параметра search
     if (search) {
-        str =  str.replace(/.+s=/, "s=").replace(/&.+/, "")
+        str = str.replace(/.+s=/, "s=").replace(/&.+/, "")
     }
     const winMap: { [key: string]: string } = {
         '%20': '+',
@@ -154,7 +156,9 @@ function decodeCyrillic(str: string, search: boolean) {
         'Ю': '%D0%AE',
         'Я': '%D0%AF'
     }
+    // Декодируем все символы Windows-1251 в кириллицу, что бы избежать повторной замены символов
     str = str.replace(/%[A-F0-9]{2}/g, (match) => winMap[match] || match)
+    // Декодируем все символы кириллицы в UTF-8
     str = str.replace(/[а-яА-Я]/g, (match) => utfMap[match] || match)
     // console.log('Decode string:', str)
     return str
@@ -165,4 +169,5 @@ function decodeCyrillic(str: string, search: boolean) {
 // const url = 'https://kinozal.tv/browse.php?s=%F2%E5%F1%F2&g=0&c=0&v=0&d=0&w=0&t=0&f=0'
 // decodeCyrillic(url, false)
 // decodeCyrillic(url, true)
-// %D1%82%D0%B5%D1%81%D1%82
+// Decode string: https://kinozal.tv/browse.php?s=%D1%82%D0%B5%D1%81%D1%82&g=0&c=0&v=0&d=0&w=0&t=0&f=0
+// Decode string: s=%D1%82%D0%B5%D1%81%D1%82
