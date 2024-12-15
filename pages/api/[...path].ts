@@ -59,7 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Обновляем url для загрузки
     if (requestUrl.includes("download.php?id=")) {
-        requestUrl = requestUrl.replace('kinozal.vercel.app','dl.kinozal.tv')
+        requestUrl = requestUrl.replace('kinozal.tv','dl.kinozal.tv')
+        console.log('Download url:', requestUrl)
     }
 
     // Логируем поисковые запросы
