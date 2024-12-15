@@ -106,6 +106,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(response.status).send(modifiedBodyBuffer)
         }
 
+        // Обновляем заголовки ответа для загрузки
+        if (requestUrl.includes("download.php?id=")) {
+            res.setHeader('Content-Type', 'application/x-bittorrent')
+            const downloadId = requestUrl.replace(/^.+id=/, "")
+            res.setHeader('Content-Disposition', `attachment; filename="id${downloadId}.torrent"`)
+        }
+
         // Возвращяем ответ клиенту через pipe по частям (без загрузки памяти)
         res.status(response.status)
         if (response.body) {
