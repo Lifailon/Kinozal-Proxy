@@ -1,10 +1,8 @@
 ## Kinozal-Proxy
 
-This is a serverless function for running a mirror to the Kinozal torrent tracker using [Next.js](https://nextjs.org).
+This is a serverless function for running a mirror to the Kinozal torrent tracker.
 
 The proxy was created to access the tracker in the [Kinozal-Bot](https://github.com/Lifailon/Kinozal-Bot) project without using a VPN, for this reason, there is an access restriction at the level of checking the agent used when sending requests.
-
-It is recommended to launch your application from this is repository to avoid unnecessary load on one copy, as well as to ensure the safety of your authorization data in the tracker.
 
 The proxy is not universal and needs improvement to proxy to other domains.
 
@@ -32,3 +30,12 @@ To access the mirror from your web browser, you can use [UserAgent-Switcher](htt
 ```
 https://raw.githubusercontent.com/Lifailon/Kinozal-Proxy/refs/heads/rsa/user-agent-switcher.json
 ```
+
+It is recommended to launch your application from this is repository to avoid unnecessary load on one copy, as well as to ensure the safety of your authorization data in the tracker.
+
+## 📚 Libraries
+
+- Handling request redirects via [Next.js](https://github.com/vercel/next.js).
+- Getting cookies via the [fetch-cookie](https://github.com/valeriangalliat/fetch-cookie) and saving authorization data for subsequent requests via the [tough-cookie](https://github.com/salesforce/tough-cookie) library.
+- Decoding the page to update the download url on the description page via the [iconv-lite](https://github.com/ashtuchkin/iconv-lite) library.
+- Custom function for decode Cyrillic (`decodeCyrillic` in middleware) when processing search queries in russian language.
