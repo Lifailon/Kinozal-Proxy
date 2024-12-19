@@ -19,7 +19,7 @@ export function middleware(req: NextRequest) {
 function decodeCyrillic(str: string, search: boolean) {
     // Удаляем все части url, оставляя только кодированные символы для параметра search
     if (search) {
-        str = str.replace(/.+s=/, "s=").replace(/&.+/, "")
+        str = str.replace(/.+s=/, "s=") // .replace(/&.+/, "")
     }
     const winMap: { [key: string]: string } = {
         '%20': '+',
